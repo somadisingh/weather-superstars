@@ -14,10 +14,10 @@ A small weather lookup app built with Angular. Search by city name or zip code a
 ```bash
 cd weather-app
 npm install
-npm start
+ng serve
 ```
 
-Open [http://localhost:4200](http://localhost:4200).
+Open [live deployed app](https://soma--weather-superstars--sq6b4k4646b5.code.run).
 
 Set your OpenWeatherMap key (server-side only; never bundled in the client):
 
