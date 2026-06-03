@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, DecimalPipe } from '@angular/common';
@@ -13,9 +13,9 @@ import { Weather, WeatherData } from './weather';
 })
 export class App {
   query = '';
-  weatherData: WeatherData | null = null;
-  isLoading = false;
-  errorMessage = '';
+  weatherData = signal<WeatherData | null>(null);
+  isLoading = signal(false);
+  errorMessage = signal('');
 
   constructor(private weather: Weather) {}
 
@@ -48,25 +48,26 @@ export class App {
 
   onSearch(): void {
     if (!this.isValidQuery()) {
-      this.errorMessage = 'Please enter a city name or zip code.';
+      this.errorMessage.set('Please enter a city name or zip code.');
       return;
     }
 
-    this.isLoading = true;
-    this.errorMessage = '';
-    this.weatherData = null;
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+    this.weatherData.set(null);
 
     this.weather.getWeather(this.query.trim()).subscribe({
       next: (data) => {
-        this.weatherData = data;
-        this.isLoading = false;
+        this.weatherData.set(data);
+        this.isLoading.set(false);
       },
       error: (err: HttpErrorResponse) => {
-        this.errorMessage =
+        this.errorMessage.set(
           err.status === 404
             ? 'Location not found. Please check your input and try again.'
-            : 'Something went wrong. Please try again later.';
-        this.isLoading = false;
+            : 'Something went wrong. Please try again later.',
+        );
+        this.isLoading.set(false);
       },
     });
   }
