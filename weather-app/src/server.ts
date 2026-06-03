@@ -8,21 +8,48 @@ import express from 'express';
 import { join } from 'node:path';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
+const openWeatherApiUrl = 'https://api.openweathermap.org/data/2.5';
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
-/**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/{*splat}', (req, res) => {
- *   // Handle API request
- * });
- * ```
- */
+function buildOpenWeatherUrl(query: string, apiKey: string): string {
+  const isZipCode = /^\d+$/.test(query);
+  const hasCountryCode = /^\d+,[a-zA-Z]{2}$/.test(query);
+  const params = new URLSearchParams({ appid: apiKey, units: 'imperial' });
+
+  if (hasCountryCode) {
+    params.set('zip', query);
+  } else if (isZipCode) {
+    params.set('zip', `${query},us`);
+  } else {
+    params.set('q', query);
+  }
+
+  return `${openWeatherApiUrl}/weather?${params}`;
+}
+
+app.get('/api/weather', async (req, res) => {
+  const apiKey = process.env['OPENWEATHER_API_KEY'];
+  if (!apiKey) {
+    res.status(503).json({ message: 'Weather API is not configured.' });
+    return;
+  }
+
+  const q = typeof req.query['q'] === 'string' ? req.query['q'].trim() : '';
+  if (q.length < 2) {
+    res.status(400).json({ message: 'Invalid query.' });
+    return;
+  }
+
+  try {
+    const upstream = await fetch(buildOpenWeatherUrl(q, apiKey));
+    const body = await upstream.json();
+    res.status(upstream.status).json(body);
+  } catch {
+    res.status(502).json({ message: 'Failed to reach weather service.' });
+  }
+});
 
 /**
  * Serve static files from /browser

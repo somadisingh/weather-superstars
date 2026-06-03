@@ -55,25 +55,7 @@ export class Weather {
       return of(this.cache[cacheKey].data);
     }
 
-    const isZipCode = /^\d+$/.test(query);
-    const hasCountryCode = /^\d+,[a-zA-Z]{2}$/.test(query);
-
-    let url: string;
-
-    if (hasCountryCode) {
-      // zip code with country code: 11218,us -> using zip endpoint
-      url = `${environment.apiUrl}/weather?zip=${query}&appid=${environment.apiKey}&units=imperial`;
-    } else if (isZipCode) {
-      // pure zip code , defaults to usa
-      url = `${environment.apiUrl}/weather?zip=${query},us&appid=${environment.apiKey}&units=imperial`;
-    } else {
-      // city name or city, country code
-      url = `${environment.apiUrl}/weather?q=${query}&appid=${environment.apiKey}&units=imperial`;
-    }
-
-    console.log('Fetching weather data for query:', query, 'from:', url);
-
-    return this.http.get<WeatherData>(url).pipe(
+    return this.http.get<WeatherData>(`${environment.apiUrl}/weather`, { params: { q: query } }).pipe(
       tap((data) => {
         this.cache[cacheKey] = { data, cachedAt: Date.now() };
       }),

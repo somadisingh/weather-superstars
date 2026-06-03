@@ -19,7 +19,13 @@ npm start
 
 Open [http://localhost:4200](http://localhost:4200).
 
-API settings live in `weather-app/src/environment/environment.ts`.
+Set your OpenWeatherMap key (server-side only; never bundled in the client):
+
+```bash
+export OPENWEATHER_API_KEY=your_key_here
+```
+
+Copy `weather-app/.env.example` to `weather-app/.env` for local reference; pass the variable when running the app or container.
 
 ## Other commands
 
@@ -35,7 +41,7 @@ From `weather-app`:
 
 ```bash
 docker build -t weather-app .
-docker run -p 4000:4000 weather-app
+docker run -p 4000:4000 -e OPENWEATHER_API_KEY=your_key_here weather-app
 ```
 
 ## Project layout
@@ -43,7 +49,7 @@ docker run -p 4000:4000 weather-app
 ```
 weather-app/
   src/app/          UI (app component) + Weather service
-  src/environment/  API URL and key
+  src/environment/  Client API base path (`/api`)
   src/server.ts     Express SSR server
   Dockerfile        Multi-stage production image
 ```
