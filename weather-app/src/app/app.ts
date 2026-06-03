@@ -1,12 +1,12 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { Weather, WeatherData } from './weather';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, DecimalPipe],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -16,7 +16,7 @@ export class App {
   isLoading: boolean = false;
   errorMessage: string = '';
 
-  constructor(private weatherService: Weather, private cdr: ChangeDetectorRef) {}
+  constructor(private weather: Weather, private cdr: ChangeDetectorRef) {}
 
   isValidQuery(): boolean {
     return this.query.trim().length >= 2;
@@ -55,13 +55,13 @@ export class App {
     this.errorMessage = '';
     this.weatherData = null;
 
-    this.weatherService.getWeather(this.query.trim()).subscribe({
-      next: (data) => {
+    this.weather.getWeather(this.query.trim()).subscribe({
+      next: (data: WeatherData) => {
         this.weatherData = data;
         this.isLoading = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: (err: any) => {
         if (err.status === 404) {
           this.errorMessage = 'Location not found. Please check your input and try again.';
         } else {
