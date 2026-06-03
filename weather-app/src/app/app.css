@@ -42,6 +42,20 @@
   letter-spacing: -0.03em;
 }
 
+.search-guide {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.search-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 0.5rem;
+}
+
 .search-row {
   display: flex;
   gap: 0.75rem;
@@ -70,6 +84,14 @@
 
 .search-input.input-error {
   border-color: rgba(255, 100, 100, 0.5);
+}
+
+.search-input:disabled {
+  opacity: 0.45;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+  cursor: not-allowed;
 }
 
 .search-btn {

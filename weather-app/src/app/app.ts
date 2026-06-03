@@ -41,7 +41,7 @@ export class App {
   }
 
   onKeyDown(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && !this.isLoading()) {
       this.onSearch();
     }
   }

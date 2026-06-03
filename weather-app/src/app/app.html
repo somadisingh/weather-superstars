@@ -3,21 +3,27 @@
     <div class="header">
       <span class="app-label">WEATHER</span>
       <h1 class="app-title">What's outside?</h1>
+      <p class="search-guide">Examples: New York or 11218 or London,uk or 57260,us</p>
     </div>
 
+    <label class="search-label" for="location-search">Location</label>
     <div class="search-row">
       <input
+        id="location-search"
         type="text"
         [(ngModel)]="query"
         (keydown)="onKeyDown($event)"
-        placeholder="City, zip code, or 11218,us..."
+        placeholder="e.g. New York or 11218"
         class="search-input"
+        [disabled]="isLoading()"
         [class.input-error]="errorMessage()"
       />
       <button
+        type="button"
         (click)="onSearch()"
         [disabled]="isLoading() || !isValidQuery()"
         class="search-btn"
+        aria-label="Search"
       >
         @if (isLoading()) {
           <span class="spinner"></span>
