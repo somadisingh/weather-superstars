@@ -71,13 +71,11 @@ export class Weather {
       url = `${environment.apiUrl}/weather?q=${query}&appid=${environment.apiKey}&units=imperial`;
     }
 
-    // const url = `${environment.apiUrl}/weather?q=${query}&appid=${environment.apiKey}&units=imperial`;
     console.log('Fetching weather data for query:', query, 'from:', url);
 
     return this.http.get<WeatherData>(url).pipe(
       tap((data) => {
         this.cache[cacheKey] = { data, cachedAt: Date.now() };
-        // console.log('Cached weather data for query:', query, 'at:', this.cache[query].cachedAt);
       }),
       catchError((error) => {
         console.error('Error fetching weather data for query:', query, error);
