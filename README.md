@@ -1,6 +1,6 @@
 # Weather Superstars
 
-A small weather lookup app built with Angular. Search by city name or zip code and see current conditions from the OpenWeatherMap API (Fahrenheit, imperial units).
+A small weather lookup app built with Angular. Search by city name or zip code and see current conditions from the OpenWeatherMap API (Fahrenheit, imperial units). Please note that the API key in the commit history has been rotated.
 
 ## Features
 
