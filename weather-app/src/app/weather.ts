@@ -46,21 +46,42 @@ export class Weather {
   constructor (private http: HttpClient) {}
 
   getWeather(query: string): Observable<WeatherData> {
-    if (this.cache[query] && this.cache[query].cachedAt > Date.now() - this.cacheDuration) {
-      console.log('Cache hit for query:', query);
-      return of(this.cache[query].data as WeatherData);
+
+    const cacheKey = query.trim().toLowerCase();
+
+
+    if (this.cache[cacheKey] && this.cache[cacheKey].cachedAt > Date.now() - this.cacheDuration) {
+      console.log('Cache hit for query:', cacheKey);
+      return of(this.cache[cacheKey].data);
     }
-    const url = `${environment.apiUrl}/weather?q=${query}&appid=${environment.apiKey}&units=imperial`;
+
+    const isZipCode = /^\d+$/.test(query);
+    const hasCountryCode = /^\d+,[a-zA-Z]{2}$/.test(query);
+
+    let url: string;
+
+    if (hasCountryCode) {
+      // zip code with country code: 11218,us -> using zip endpoint
+      url = `${environment.apiUrl}/weather?zip=${query}&appid=${environment.apiKey}&units=imperial`;
+    } else if (isZipCode) {
+      // pure zip code , defaults to usa
+      url = `${environment.apiUrl}/weather?zip=${query},us&appid=${environment.apiKey}&units=imperial`;
+    } else {
+      // city name or city, country code
+      url = `${environment.apiUrl}/weather?q=${query}&appid=${environment.apiKey}&units=imperial`;
+    }
+
+    // const url = `${environment.apiUrl}/weather?q=${query}&appid=${environment.apiKey}&units=imperial`;
     console.log('Fetching weather data for query:', query, 'from:', url);
 
     return this.http.get<WeatherData>(url).pipe(
       tap((data) => {
-        this.cache[query] = { data: data as WeatherData, cachedAt: Date.now() };
-        console.log('Cached weather data for query:', query, 'at:', this.cache[query].cachedAt);
+        this.cache[cacheKey] = { data, cachedAt: Date.now() };
+        // console.log('Cached weather data for query:', query, 'at:', this.cache[query].cachedAt);
       }),
       catchError((error) => {
         console.error('Error fetching weather data for query:', query, error);
-        return throwError(() => new Error(`Failed to fetch weather data for query: ${query}`));
+        return throwError(() => error);
       })
     );
   }
