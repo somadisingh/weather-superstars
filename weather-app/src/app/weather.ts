@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
-import { environment } from '../environment/environment';
+import { Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 export interface WeatherData {
   name: string;
@@ -40,29 +39,21 @@ export interface WeatherData {
   providedIn: 'root',
 })
 export class Weather {
-  private cache: { [zip: string]: { data: WeatherData, cachedAt: number } } = {};
-  private readonly cacheDuration = 1000 * 60 * 60; // weather data is valid for 1 hour
+  private cache = new Map<string, { data: WeatherData; cachedAt: number }>();
+  private readonly cacheDurationMs = 60 * 60 * 1000;
 
-  constructor (private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
   getWeather(query: string): Observable<WeatherData> {
-
     const cacheKey = query.trim().toLowerCase();
+    const cached = this.cache.get(cacheKey);
 
-
-    if (this.cache[cacheKey] && this.cache[cacheKey].cachedAt > Date.now() - this.cacheDuration) {
-      console.log('Cache hit for query:', cacheKey);
-      return of(this.cache[cacheKey].data);
+    if (cached && cached.cachedAt > Date.now() - this.cacheDurationMs) {
+      return of(cached.data);
     }
 
-    return this.http.get<WeatherData>(`${environment.apiUrl}/weather`, { params: { q: query } }).pipe(
-      tap((data) => {
-        this.cache[cacheKey] = { data, cachedAt: Date.now() };
-      }),
-      catchError((error) => {
-        console.error('Error fetching weather data for query:', query, error);
-        return throwError(() => error);
-      })
-    );
+    return this.http
+      .get<WeatherData>('/api/weather', { params: { q: query } })
+      .pipe(tap((data) => this.cache.set(cacheKey, { data, cachedAt: Date.now() })));
   }
 }

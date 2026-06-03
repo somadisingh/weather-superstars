@@ -1,4 +1,5 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { Weather, WeatherData } from './weather';
@@ -11,12 +12,12 @@ import { Weather, WeatherData } from './weather';
   styleUrl: './app.css',
 })
 export class App {
-  query: string = '';
+  query = '';
   weatherData: WeatherData | null = null;
-  isLoading: boolean = false;
-  errorMessage: string = '';
+  isLoading = false;
+  errorMessage = '';
 
-  constructor(private weather: Weather, private cdr: ChangeDetectorRef) {}
+  constructor(private weather: Weather) {}
 
   isValidQuery(): boolean {
     return this.query.trim().length >= 2;
@@ -56,20 +57,17 @@ export class App {
     this.weatherData = null;
 
     this.weather.getWeather(this.query.trim()).subscribe({
-      next: (data: WeatherData) => {
+      next: (data) => {
         this.weatherData = data;
         this.isLoading = false;
-        this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        if (err.status === 404) {
-          this.errorMessage = 'Location not found. Please check your input and try again.';
-        } else {
-          this.errorMessage = 'Something went wrong. Please try again later.';
-        }
+      error: (err: HttpErrorResponse) => {
+        this.errorMessage =
+          err.status === 404
+            ? 'Location not found. Please check your input and try again.'
+            : 'Something went wrong. Please try again later.';
         this.isLoading = false;
-        this.cdr.detectChanges();
-      }
+      },
     });
   }
 }

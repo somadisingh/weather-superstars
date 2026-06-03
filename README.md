@@ -25,8 +25,6 @@ Set your OpenWeatherMap key (server-side only; never bundled in the client):
 export OPENWEATHER_API_KEY=your_key_here
 ```
 
-Copy `weather-app/.env.example` to `weather-app/.env` for local reference; pass the variable when running the app or container.
-
 ## Other commands
 
 | Command | Description |
@@ -48,8 +46,7 @@ docker run -p 4000:4000 -e OPENWEATHER_API_KEY=your_key_here weather-app
 
 ```
 weather-app/
-  src/app/          UI (app component) + Weather service
-  src/environment/  Client API base path (`/api`)
-  src/server.ts     Express SSR server
-  Dockerfile        Multi-stage production image
+  src/app/       UI + Weather service (calls `/api/weather`)
+  src/server.ts  Express SSR + API proxy
+  Dockerfile     Production image
 ```
